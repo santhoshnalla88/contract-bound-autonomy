@@ -14,13 +14,23 @@ Per the source vision, we work **design-first**, then implement **one module at 
 | [03 — Domain Model](03-domain-model.md) | 4 | DDD: entities, aggregates, value objects, commands, events, policies |
 | [04 — Roadmap](04-roadmap.md) | 9 | Phased milestones, what already exists, sprint plan, prioritization |
 
-## Interview preparation (learn the stack from this repo)
+## Interview preparation (learn the stack from this repo) — start here
+Beginner-friendly, deeply-technical guides that teach each concept **from this codebase** (plain-English analogy → where in the app → why → code → interview Q&A):
+
 | Guide | Covers |
 |---|---|
-| [Interview — AI Stack](interview-ai-stack.md) | LangGraph, reducers/checkpointers, multi-agent, RAG, MCP, the governance pipeline (adaptive contracts, policy, risk-v2, budgets, guardrails), trust, saga compensation, production concerns — each with code references + Q&A |
-| [Interview — React & Frontend](interview-react.md) | React 19, Vite, TS, react-router, Recharts, CSS design tokens, hooks — plus **how to wire the UI to the backend** (fetch, SSE, JWT) with Q&A |
+| ⭐ [Learning Path](interview-learning-path.md) | The order to study it, the 3 sentences to memorize, a 2-minute demo script, and two "I debugged a real problem" stories |
+| [Interview — AI Stack](interview-ai-stack.md) | LLM mental model, LangChain provider factory (**Claude + Gemini**), structured output, LangGraph (state/reducers/checkpointer/`interrupt`), **RAG (ChromaDB)** + **GraphRAG (Neo4j)**, agents, the governance pipeline, MCP, distributed workers, audit — each with code refs + Q&A |
+| [Interview — React & Frontend](interview-react.md) | React 19, Vite, TS, hooks (+ the `useEffect` cleanup interviewers love), react-router, **Context-based JWT auth + RBAC**, typed fetch client, **live SSE timeline**, Recharts — grounded in the wired UI |
 
-## Where we are today (honest baseline)
-A **production-grade vertical slice** already exists and runs: contract engine + deterministic guardrails, risk evaluation, human-in-the-loop, MCP execution boundary (mock **+ real Kubernetes**), Postgres-durable state, JWT+RBAC auth, Arq/Redis queue + worker, Redis-Streams real-time events, audit ledger, control-plane UI, Docker Compose stack, tests.
+## Where we are today (verified, real stack)
+A **working platform** that runs end-to-end on real infrastructure — verified with live API keys:
 
-It is currently **one domain** (infrastructure Incident Commander). The program generalizes it into the reusable **core** and adds the missing platform engines and a **Payments** flagship. See [04 — Roadmap](04-roadmap.md) for the exact gap-to-plan mapping.
+- **Real LLMs (dual-provider):** Claude Opus 4.8 (planning) + Claude Haiku 4.5 (compliance) + Gemini Flash (summaries), behind a provider-agnostic factory (`core/llm/factory.py`).
+- **Hybrid knowledge:** ChromaDB vector store (local embeddings, auto-ingested at startup) **+ Neo4j** service-dependency graph (blast-radius enrichment).
+- **Governance:** adaptive contracts, deterministic guardrails, semantic policy, numeric risk, execution budgets.
+- **Orchestration:** LangGraph (14 nodes, retry loop, `interrupt()` HITL), durable **Postgres checkpointer**, **Arq/Redis** queue + separate worker, **Redis-Streams** SSE.
+- **Security & ops:** JWT + RBAC, audit ledger, rate limiting, `/metrics`, `/ready` (checks DB/Redis), **React 19** control plane.
+- **Full environment:** `docker compose up` brings up **postgres + redis + neo4j + api + worker**; 33 tests pass.
+
+**Verified end-to-end:** submit incident → Claude plans (grounded in runbook + graph) → guardrails → semantic policy → risk HIGH → human approval → execute → postconditions pass → **SUCCESS**, with a complete audit trail.
