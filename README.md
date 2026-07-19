@@ -1,9 +1,8 @@
 # GAAP — Governed Autonomous Agent Platform
 
-[![CI](https://github.com/santhoshnalla/contract-bound-autonomy/actions/workflows/ci.yml/badge.svg)](https://github.com/santhoshnalla/contract-bound-autonomy/actions)
+[![CI](https://github.com/santhoshnalla88/contract-bound-autonomy/actions/workflows/ci.yml/badge.svg)](https://github.com/santhoshnalla88/contract-bound-autonomy/actions)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![React 19](https://img.shields.io/badge/react-19-61dafb.svg)](https://react.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 > **"Reason freely within boundaries. Act only with authorization."**
 
@@ -204,12 +203,6 @@ gaap/
 - [02 — Architecture](docs/02-architecture.md)
 - [03 — Domain Model](docs/03-domain-model.md)
 - [04 — Roadmap](docs/04-roadmap.md)
-
----
-
-## License
-
-MIT
 
 ---
 
