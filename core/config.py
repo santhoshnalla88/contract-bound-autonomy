@@ -84,7 +84,10 @@ class Settings(BaseSettings):
     langsmith_project: str = "contract-bound-autonomy"
 
     # --- Execution boundary ---
-    execution_backend: Literal["mock", "kubernetes"] = "mock"
+    # Any name registered via core.execution.drivers.register_driver — "mock" and
+    # "kubernetes" are built in; orgs add their own (e.g. "host", "servicenow")
+    # without editing core. Validated against the registry in create_driver().
+    execution_backend: str = "mock"
     k8s_namespace: str = "default"
     k8s_in_cluster: bool = False  # True when running inside a pod
     k8s_kubeconfig: str = ""      # optional explicit kubeconfig path

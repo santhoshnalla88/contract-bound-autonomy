@@ -34,6 +34,13 @@ class MCPClient:
         ActionType.BLOCK_MERCHANT,
         ActionType.REFUND_TRANSACTION,
         ActionType.REROUTE_GATEWAY,
+        # Target-neutral verbs (servers / batch / cloud / on-prem).
+        ActionType.RUN_COMMAND,
+        ActionType.RESTART_SERVICE,
+        ActionType.START_SERVICE,
+        ActionType.STOP_SERVICE,
+        ActionType.RUN_BATCH_JOB,
+        ActionType.HTTP_REQUEST,
     })
 
     def __init__(self, driver: ExecutionDriver | None = None) -> None:

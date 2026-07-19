@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
 
@@ -78,6 +78,11 @@ class OperationalContract(BaseModel):
     retry_policy: RetryPolicy = Field(default_factory=RetryPolicy)
 
     postconditions: list[str] = Field(default_factory=list)
+
+    # Optional per-service adaptive rules (context → narrow the contract).
+    # Each entry matches core.contracts.adaptive.AdaptiveRule. Config-driven so an
+    # organization tunes autonomy per service WITHOUT code changes.
+    adaptive_rules: list[dict[str, Any]] = Field(default_factory=list)
 
     def get_postcondition_rules(self) -> list[PostconditionRule]:
         """Parse string postconditions into structured evaluable rules."""

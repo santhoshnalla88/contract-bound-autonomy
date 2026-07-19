@@ -20,7 +20,16 @@ class ActionType(str, Enum):
     BLOCK_MERCHANT = "block_merchant"
     REFUND_TRANSACTION = "refund_transaction"
     REROUTE_GATEWAY = "reroute_gateway"
-    # Will be made extensible in future phases
+
+    # Target-neutral actions — let contracts govern ANY workload, not just
+    # Kubernetes: Linux/Windows servers, batch/cron systems, on-prem apps, and
+    # cloud/SaaS APIs. Each maps to a driver method; see core/execution/drivers.
+    RUN_COMMAND = "run_command"        # run an allowlisted command on a host (SSH/WinRM/local)
+    RESTART_SERVICE = "restart_service"  # systemd unit / Windows service / app process
+    START_SERVICE = "start_service"
+    STOP_SERVICE = "stop_service"
+    RUN_BATCH_JOB = "run_batch_job"    # trigger a batch/ETL/cron/scheduler job
+    HTTP_REQUEST = "http_request"      # call a REST/cloud/SaaS API or webhook
 
 class GuardrailStatus(StrEnum):
     APPROVED = "APPROVED"

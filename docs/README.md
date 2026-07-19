@@ -13,6 +13,7 @@ Per the source vision, we work **design-first**, then implement **one module at 
 | [02 — Architecture](02-architecture.md) | 3 | C4 diagrams, key sequences, bounded contexts, module catalog, tech decisions |
 | [03 — Domain Model](03-domain-model.md) | 4 | DDD: entities, aggregates, value objects, commands, events, policies |
 | [04 — Roadmap](04-roadmap.md) | 9 | Phased milestones, what already exists, sprint plan, prioritization |
+| [Adoption Guide](ADOPTION.md) | — | **Friendly, non-code walkthrough** of plugging GAAP into any organization: contracts, runbooks, adaptive rules, topology, and wiring |
 
 ## Where we are today (verified, real stack)
 A **working platform** that runs end-to-end on real infrastructure — verified with live API keys:
@@ -22,6 +23,7 @@ A **working platform** that runs end-to-end on real infrastructure — verified 
 - **Governance:** adaptive contracts, deterministic guardrails, semantic policy, numeric risk, execution budgets.
 - **Orchestration:** LangGraph (14 nodes, retry loop, `interrupt()` HITL), durable **Postgres checkpointer**, **Arq/Redis** queue + separate worker, **Redis-Streams** SSE.
 - **Security & ops:** JWT + RBAC, audit ledger, rate limiting, `/metrics`, `/ready` (checks DB/Redis), **React 19** control plane.
-- **Full environment:** `docker compose up` brings up **postgres + redis + neo4j + api + worker**; 33 tests pass.
+- **Full environment:** `docker compose up` brings up **postgres + redis + neo4j + api + worker**; 38 tests pass.
+- **Integrates any target:** pluggable execution-driver registry — Kubernetes, Linux/Windows hosts, batch jobs, cloud/SaaS APIs — selected by `EXECUTION_BACKEND` (see [Adoption Guide §5b](ADOPTION.md)).
 
 **Verified end-to-end:** submit incident → Claude plans (grounded in runbook + graph) → guardrails → semantic policy → risk HIGH → human approval → execute → postconditions pass → **SUCCESS**, with a complete audit trail.

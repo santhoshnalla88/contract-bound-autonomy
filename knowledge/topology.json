@@ -1,0 +1,21 @@
+{
+  "_comment": "Service-dependency graph for GraphRAG blast-radius. Each dependency reads 'service DEPENDS_ON depends_on' — if 'depends_on' degrades, 'service' is impacted. Edit this file to describe YOUR organization's topology; no code changes needed. Seeded into Neo4j at startup when GRAPH_ENABLED=true.",
+  "dependencies": [
+    { "service": "checkout-service", "depends_on": "inventory-service" },
+    { "service": "checkout-service", "depends_on": "payment-gateway" },
+    { "service": "api-gateway", "depends_on": "checkout-service" },
+    { "service": "api-gateway", "depends_on": "inventory-service" },
+    { "service": "inventory-service", "depends_on": "inventory-db" },
+    { "service": "inventory-service", "depends_on": "cache-redis" },
+    { "service": "payment-gateway", "depends_on": "cache-redis" },
+    { "service": "settlement-worker", "depends_on": "payment-gateway" },
+    { "service": "mobile-bff", "depends_on": "api-gateway" }
+  ],
+  "criticality": {
+    "checkout-service": "CRITICAL",
+    "payment-gateway": "CRITICAL",
+    "api-gateway": "HIGH",
+    "inventory-service": "HIGH",
+    "settlement-worker": "MEDIUM"
+  }
+}

@@ -21,5 +21,16 @@
     "rollback_deployment": true
   },
   "retry_policy": { "max_plan_retries": 3 },
-  "postconditions": ["healthy_pod_count >= 3", "error_rate < 5"]
+  "postconditions": ["healthy_pod_count >= 3", "error_rate < 5"],
+  "adaptive_rules": [
+    {
+      "rule_id": "restrict_scale_on_critical",
+      "description": "For CRITICAL incidents, disable scaling and lower max restarts to 1 (tighter autonomy under high severity).",
+      "min_severity_level": "CRITICAL",
+      "mutation": {
+        "override_max_pod_restarts": 1,
+        "remove_allowed_actions": ["scale_deployment"]
+      }
+    }
+  ]
 }

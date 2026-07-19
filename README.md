@@ -6,7 +6,7 @@
 
 > **"Reason freely within boundaries. Act only with authorization."**
 
-A production-grade, RAG-augmented, **contract-bound** autonomous operations platform. GAAP reasons over organization-specific knowledge (vector store + knowledge graph), enforces machine-readable operational boundaries before any action, executes through a controlled MCP boundary (real Kubernetes or mock), and fronts everything with an authenticated, real-time **Operations Control Plane**.
+A production-grade, RAG-augmented, **contract-bound** autonomous operations platform. GAAP reasons over organization-specific knowledge (vector store + knowledge graph), enforces machine-readable operational boundaries before any action, executes through a controlled MCP boundary with a **pluggable driver registry** (Kubernetes, Linux/Windows hosts, batch jobs, cloud/SaaS APIs, or mock), and fronts everything with an authenticated, real-time **Operations Control Plane**.
 
 **Author:** [Santhosh Kumar Nalla](https://linkedin.com/in/techiesanthoshnalla) — Senior Software Engineer & AI Engineering Architect | 14+ years in financial platforms (Mastercard), Java/Python, agentic AI systems
 
@@ -47,7 +47,8 @@ GAAP solves this with a **layered governance stack** that wraps every LLM decisi
        └────────────────┘                                  ▼
                                               ┌─────────────────────────┐
                                               │   MCP execution boundary │
-                                              │  driver: kubernetes|mock │
+                                              │ pluggable driver registry│
+                                              │ k8s · host · batch · SaaS│
                                               └─────────────────────────┘
   Postgres (state · audit · users)  ·  Redis (events · queue)  ·  Neo4j  ·  LangSmith
 ```
@@ -160,7 +161,7 @@ Open http://localhost:5173 for the control plane.
 ## Testing
 
 ```bash
-# All 33 tests — unit + integration + workflow (no external services needed)
+# All 38 tests — unit + integration + workflow (no external services needed)
 pytest
 
 # Real end-to-end in Docker stack (Claude + RAG + Neo4j + workers)
@@ -187,9 +188,12 @@ gaap/
 │   ├── api/                  # FastAPI gateway (auth, RBAC, routes)
 │   ├── worker/               # Arq worker (runs orchestration)
 │   └── ui/                   # React 19 control plane (Vite + TypeScript)
-├── examples/                 # Domain showcases
-├── knowledge/                # Runbooks, architecture docs (ingested into RAG)
-├── tests/                    # 33 tests (unit + API + workflow)
+├── examples/                 # Domain showcases + reference drivers
+│   ├── incident_commander/   #   Kubernetes driver
+│   ├── payments_commander/   #   Payments-domain driver
+│   └── host_commander/       #   Linux/Windows/batch/SaaS reference driver
+├── knowledge/                # Runbooks, architecture, contracts, topology.json (ingested into RAG)
+├── tests/                    # 38 tests (unit + API + workflow)
 ├── docs/                     # Design documents
 ├── .github/workflows/        # CI pipeline
 └── docker-compose.yml        # Full stack: Postgres + Redis + Neo4j + API + Worker
@@ -197,12 +201,20 @@ gaap/
 
 ---
 
+## Adopting This Platform
+
+New to the project and want to run it against your own services?
+**[📘 Adoption Guide →](docs/ADOPTION.md)** — a friendly, non-code walkthrough:
+onboard a service with four config files (contract, runbooks, adaptive rules,
+topology), pick your AI models and execution backend, and roll out safely.
+
 ## Design Documents
 
 - [01 — Vision & Requirements](docs/01-vision-and-requirements.md)
 - [02 — Architecture](docs/02-architecture.md)
 - [03 — Domain Model](docs/03-domain-model.md)
 - [04 — Roadmap](docs/04-roadmap.md)
+- [Adoption Guide](docs/ADOPTION.md)
 
 ---
 

@@ -12,6 +12,7 @@ the workflow proceeds on RAG alone — the graph *enriches*, it never blocks.
 
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any
 
@@ -19,7 +20,9 @@ from core.config import Settings, get_settings
 
 logger = logging.getLogger(__name__)
 
-# Demo microservice topology: (dependent) -[:DEPENDS_ON]-> (dependency).
+# Built-in fallback topology, used only when no topology file is provided.
+# An organization supplies its OWN topology via knowledge/topology.json (see
+# `_load_topology`) — this default just lets the demo run out of the box.
 # "A DEPENDS_ON B" means A breaks if B is degraded — so B's blast radius includes A.
 _TOPOLOGY: list[tuple[str, str]] = [
     ("checkout-service", "inventory-service"),
@@ -41,6 +44,42 @@ _CRITICALITY: dict[str, str] = {
 }
 
 
+def _load_topology(
+    settings: Settings,
+) -> tuple[list[tuple[str, str]], dict[str, str]]:
+    """Load the service topology from ``knowledge/topology.json`` if present.
+
+    File format (all fields optional)::
+
+        {
+          "dependencies": [{"service": "checkout-service", "depends_on": "inventory-service"}, ...],
+          "criticality":  {"checkout-service": "CRITICAL", ...}
+        }
+
+    Falls back to the built-in demo topology when the file is absent or invalid,
+    so the graph always seeds *something* rather than blocking startup.
+    """
+    path = settings.knowledge_dir / "topology.json"
+    if not path.exists():
+        return _TOPOLOGY, _CRITICALITY
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        edges = [
+            (d["service"], d["depends_on"])
+            for d in data.get("dependencies", [])
+            if d.get("service") and d.get("depends_on")
+        ]
+        criticality = dict(data.get("criticality", {}))
+        if not edges:
+            logger.warning("topology.json has no dependencies — using built-in topology")
+            return _TOPOLOGY, _CRITICALITY
+        logger.info("Loaded service topology from %s (%d edges)", path, len(edges))
+        return edges, criticality
+    except Exception:
+        logger.warning("Failed to parse %s — using built-in topology", path)
+        return _TOPOLOGY, _CRITICALITY
+
+
 class ServiceGraph:
     """Thin wrapper over the Neo4j driver for dependency queries."""
 
@@ -59,11 +98,21 @@ class ServiceGraph:
         except Exception:
             return False
 
-    def seed(self) -> int:
-        """Create the service topology (idempotent via MERGE). Returns edge count."""
+    def seed(
+        self,
+        topology: list[tuple[str, str]] | None = None,
+        criticality: dict[str, str] | None = None,
+    ) -> int:
+        """Create the service topology (idempotent via MERGE). Returns edge count.
+
+        Pass an org-specific ``topology``/``criticality`` (see ``_load_topology``);
+        omit both to use the built-in demo topology.
+        """
+        topology = topology if topology is not None else _TOPOLOGY
+        criticality = criticality if criticality is not None else _CRITICALITY
         with self._driver.session() as session:
             session.run("MATCH (n:Service) DETACH DELETE n")
-            for dependent, dependency in _TOPOLOGY:
+            for dependent, dependency in topology:
                 session.run(
                     """
                     MERGE (a:Service {name: $a})
@@ -73,13 +122,13 @@ class ServiceGraph:
                     a=dependent,
                     b=dependency,
                 )
-            for name, crit in _CRITICALITY.items():
+            for name, crit in criticality.items():
                 session.run(
                     "MERGE (s:Service {name: $name}) SET s.criticality = $crit",
                     name=name,
                     crit=crit,
                 )
-        return len(_TOPOLOGY)
+        return len(topology)
 
     def blast_radius(self, service: str) -> dict[str, Any]:
         """Return services impacted if ``service`` is degraded/restarted.
@@ -141,7 +190,8 @@ def seed_service_graph(settings: Settings) -> None:
     g = get_service_graph(settings)
     if g is None:
         return
-    n = g.seed()
+    topology, criticality = _load_topology(settings)
+    n = g.seed(topology, criticality)
     logger.info("Neo4j service-dependency graph seeded (%d edges)", n)
 
 

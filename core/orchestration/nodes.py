@@ -179,22 +179,18 @@ def resolve_contract(state: OrchestratorState) -> dict[str, Any]:
 
     try:
         base_contract = loader.load(service=service, environment=environment)
-        
-        # Phase B1: Resolve Effective Contract using Adaptive Rules
-        # Hardcoding a demo rule until a rule persistence layer is implemented
-        demo_rules = [
-            AdaptiveRule(
-                rule_id="restrict_scale_on_critical",
-                description="Disable scaling and lower max restarts for CRITICAL incidents",
-                min_severity_level="CRITICAL",
-                mutation=RuleMutation(
-                    override_max_pod_restarts=1,
-                    remove_allowed_actions=["scale_deployment"]
-                )
-            )
-        ]
-        
-        resolver = AdaptiveContractResolver(demo_rules)
+
+        # Adaptive rules are declared in the contract JSON (config-driven, per service)
+        # — an organization tunes autonomy without touching code. Empty list = static
+        # contract. Malformed rules are skipped so one bad rule can't block remediation.
+        rules: list[AdaptiveRule] = []
+        for raw in base_contract.adaptive_rules:
+            try:
+                rules.append(AdaptiveRule(**raw))
+            except Exception:
+                logger.warning("Skipping malformed adaptive rule in contract %s", base_contract.contract_id)
+
+        resolver = AdaptiveContractResolver(rules)
         adaptive_ctx = AdaptiveContext(
             incident_severity=incident.get("severity", "LOW"),
             environment=environment,
