@@ -14,15 +14,6 @@ Per the source vision, we work **design-first**, then implement **one module at 
 | [03 — Domain Model](03-domain-model.md) | 4 | DDD: entities, aggregates, value objects, commands, events, policies |
 | [04 — Roadmap](04-roadmap.md) | 9 | Phased milestones, what already exists, sprint plan, prioritization |
 
-## Interview preparation (learn the stack from this repo) — start here
-Beginner-friendly, deeply-technical guides that teach each concept **from this codebase** (plain-English analogy → where in the app → why → code → interview Q&A):
-
-| Guide | Covers |
-|---|---|
-| ⭐ [Learning Path](interview-learning-path.md) | The order to study it, the 3 sentences to memorize, a 2-minute demo script, and two "I debugged a real problem" stories |
-| [Interview — AI Stack](interview-ai-stack.md) | LLM mental model, LangChain provider factory (**Claude + Gemini**), structured output, LangGraph (state/reducers/checkpointer/`interrupt`), **RAG (ChromaDB)** + **GraphRAG (Neo4j)**, agents, the governance pipeline, MCP, distributed workers, audit — each with code refs + Q&A |
-| [Interview — React & Frontend](interview-react.md) | React 19, Vite, TS, hooks (+ the `useEffect` cleanup interviewers love), react-router, **Context-based JWT auth + RBAC**, typed fetch client, **live SSE timeline**, Recharts — grounded in the wired UI |
-
 ## Where we are today (verified, real stack)
 A **working platform** that runs end-to-end on real infrastructure — verified with live API keys:
 
