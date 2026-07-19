@@ -1,0 +1,110 @@
+# Shared config for api + worker (top-level YAML anchor).
+x-app-env: &app-env
+  APP_ENV: production
+  DATABASE_URL: postgresql+asyncpg://gaap:gaap@postgres:5432/gaap
+  CHECKPOINTER_URL: postgresql://gaap:gaap@postgres:5432/gaap
+  REDIS_URL: redis://redis:6379/0
+  JWT_SECRET: ${JWT_SECRET:-please-change-me-in-real-prod-0123456789}
+  BOOTSTRAP_ADMIN_EMAIL: ${BOOTSTRAP_ADMIN_EMAIL:-admin@local}
+  BOOTSTRAP_ADMIN_PASSWORD: ${BOOTSTRAP_ADMIN_PASSWORD:-changeme}
+  ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:8000}
+  EXECUTION_BACKEND: ${EXECUTION_BACKEND:-mock}
+  # --- LLM keys (both used: Claude reasoning, Gemini summary) ---
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  PLANNER_PROVIDER: ${PLANNER_PROVIDER:-anthropic}
+  PLANNER_MODEL: ${PLANNER_MODEL:-claude-opus-4-8}
+  POLICY_PROVIDER: ${POLICY_PROVIDER:-anthropic}
+  POLICY_MODEL: ${POLICY_MODEL:-claude-haiku-4-5}
+  SUMMARY_PROVIDER: ${SUMMARY_PROVIDER:-google}
+  SUMMARY_MODEL: ${SUMMARY_MODEL:-gemini-2.0-flash}
+  # --- Vector DB (RAG) + Graph DB ---
+  EMBEDDING_PROVIDER: local
+  INGEST_ON_STARTUP: "true"
+  GRAPH_ENABLED: "true"
+  NEO4J_URI: bolt://neo4j:7687
+  NEO4J_USER: neo4j
+  NEO4J_PASSWORD: ${NEO4J_PASSWORD:-gaapgraph123}
+  LANGSMITH_TRACING: "false"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: gaap_postgres
+    environment:
+      POSTGRES_USER: gaap
+      POSTGRES_PASSWORD: gaap
+      POSTGRES_DB: gaap
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gaap"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: gaap_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  neo4j:
+    image: neo4j:5-community
+    container_name: gaap_neo4j
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-gaapgraph123}
+    ports:
+      - "7474:7474"   # Neo4j Browser
+      - "7687:7687"   # Bolt
+    volumes:
+      - neo4jdata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p ${NEO4J_PASSWORD:-gaapgraph123} 'RETURN 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+
+  api:
+    build: .
+    container_name: gaap_api
+    command: ["uvicorn", "apps.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+    ports:
+      - "8000:8000"
+    environment: *app-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    volumes:
+      - ./knowledge:/app/knowledge
+
+  worker:
+    build: .
+    container_name: gaap_worker
+    command: ["python", "-m", "arq", "apps.worker.worker.WorkerSettings"]
+    environment: *app-env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    volumes:
+      - ./knowledge:/app/knowledge
+
+volumes:
+  pgdata:
+  neo4jdata:

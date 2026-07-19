@@ -1,0 +1,25 @@
+{
+  "contract_id": "inventory-service-production-v1",
+  "service": "inventory-service",
+  "environment": "production",
+  "version": "1.0.0",
+  "allowed_actions": ["restart_pods", "scale_deployment", "rollback_deployment"],
+  "forbidden_actions": ["delete_persistent_volume", "drop_database", "modify_production_secrets"],
+  "limits": {
+    "max_pod_restarts_per_incident": 2,
+    "max_replicas": 10,
+    "max_scale_up_percentage": 200
+  },
+  "availability_constraints": {
+    "minimum_available_replicas": 2,
+    "preserve_active_connections": true,
+    "max_unavailability_percentage": 25
+  },
+  "approval_requirements": {
+    "restart_pods": false,
+    "scale_deployment": false,
+    "rollback_deployment": true
+  },
+  "retry_policy": { "max_plan_retries": 3 },
+  "postconditions": ["healthy_pod_count >= 3", "error_rate < 5"]
+}

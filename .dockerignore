@@ -1,0 +1,15 @@
+.venv/
+data/
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.git/
+.env
+*.db
+tests/
+# Exclude JS deps (huge) but KEEP apps/ui/dist so the API serves the built UI
+node_modules/
+**/node_modules/

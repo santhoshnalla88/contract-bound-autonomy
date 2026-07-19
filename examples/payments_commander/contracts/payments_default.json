@@ -1,0 +1,19 @@
+{
+  "contract_id": "PAY-001",
+  "service": "gateway-service",
+  "environment": "production",
+  "version": "1.0",
+  "allowed_actions": [
+    "reroute_gateway",
+    "block_merchant",
+    "refund_transaction"
+  ],
+  "forbidden_actions": [],
+  "postconditions": [
+    "decline_rate <= 10.0"
+  ],
+  "retry_policy": {
+    "max_plan_retries": 2,
+    "max_execution_retries": 1
+  }
+}

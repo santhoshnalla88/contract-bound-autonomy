@@ -1,0 +1,26 @@
+# Secrets — NEVER commit
+.env
+*.key
+*.docx
+test.py
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Data / local state
+data/
+*.db
+
+# Node / React
+node_modules/
+apps/ui/dist/
+
+# OS
+.DS_Store
+Thumbs.db
