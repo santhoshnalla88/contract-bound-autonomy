@@ -3,6 +3,7 @@
 *.key
 *.docx
 test.py
+*interview*.md
 
 # Python
 .venv/
