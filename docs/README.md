@@ -13,6 +13,7 @@ Per the source vision, we work **design-first**, then implement **one module at 
 | [02 — Architecture](02-architecture.md) | 3 | C4 diagrams, key sequences, bounded contexts, module catalog, tech decisions |
 | [03 — Domain Model](03-domain-model.md) | 4 | DDD: entities, aggregates, value objects, commands, events, policies |
 | [04 — Roadmap](04-roadmap.md) | 9 | Phased milestones, what already exists, sprint plan, prioritization |
+| [Use Case](USE-CASE.md) | — | **One production incident, end to end** — what the platform does and why each component (contracts, RAG, graph, risk, approval, audit) earns its place |
 | [Adoption Guide](ADOPTION.md) | — | **Friendly, non-code walkthrough** of plugging GAAP into any organization: contracts, runbooks, adaptive rules, topology, and wiring |
 
 ## Where we are today (verified, real stack)

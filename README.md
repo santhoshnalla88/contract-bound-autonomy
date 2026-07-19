@@ -201,12 +201,15 @@ gaap/
 
 ---
 
-## Adopting This Platform
+## Understanding & Adopting This Platform
 
-New to the project and want to run it against your own services?
-**[📘 Adoption Guide →](docs/ADOPTION.md)** — a friendly, non-code walkthrough:
-onboard a service with four config files (contract, runbooks, adaptive rules,
-topology), pick your AI models and execution backend, and roll out safely.
+- **New here? Start with the [📖 Use Case →](docs/USE-CASE.md)** — one production
+  incident walked end-to-end, showing what the platform does and why every part
+  (contracts, RAG, graph, risk, approval, audit) earns its place.
+- Ready to run it against your own services? **[📘 Adoption Guide →](docs/ADOPTION.md)** —
+  a non-code walkthrough: onboard a service with four config files (contract,
+  runbooks, adaptive rules, topology), pick your AI models and execution backend,
+  integrate any target, and roll out safely.
 
 ## Design Documents
 
@@ -214,6 +217,7 @@ topology), pick your AI models and execution backend, and roll out safely.
 - [02 — Architecture](docs/02-architecture.md)
 - [03 — Domain Model](docs/03-domain-model.md)
 - [04 — Roadmap](docs/04-roadmap.md)
+- [Use Case — a production incident, end to end](docs/USE-CASE.md)
 - [Adoption Guide](docs/ADOPTION.md)
 
 ---
